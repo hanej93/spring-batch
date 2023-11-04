@@ -1,11 +1,33 @@
 spring:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+  profiles:
+    active: local
 
+---
+spring:
+  config:
+    activate:
+      on-profile: local
   datasource:
-    url: jdbc:h2:mem:springbatch
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    hikari:
+      jdbc-url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username: sa
+      password:
+      driver-class-name: org.h2.Driver
+  batch:
+    jdbc:
+      initialize-schema: embedded
+
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    hikari:
+      jdbc-url: jdbc:mysql://localhost:3306/springbatch?useUnicode=true&characterEncoding=utf8
+      username: root
+      password: mysql
+      driver-class-name: com.mysql.jdbc.Driver
+  batch:
+    jdbc:
+      initialize-schema: always
