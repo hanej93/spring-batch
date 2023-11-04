@@ -10,9 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-
-// @Configuration
-public class DBJobConfiguration {
+@Configuration
+public class JobConfiguration {
 
 	@Bean
 	public Job job(JobRepository jobRepository, Step step1, Step step2) {
