@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-public class JobExecutionConfiguration {
+public class StepConfiguration {
 
 	@Bean
 	public Job job(JobRepository jobRepository, Step step1, Step step2) {
@@ -34,11 +34,7 @@ public class JobExecutionConfiguration {
 	@Bean
 	public Step step2(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 		return new StepBuilder("step2", jobRepository)
-			.tasklet((contribution, chunkContext) -> {
-				System.out.println("step2 was executed");
-				// throw new RuntimeException("step2 has failed");
-				return RepeatStatus.FINISHED;
-			}, transactionManager)
+			.tasklet(new CustomTasklet(), transactionManager)
 			.build();
 	}
 }
