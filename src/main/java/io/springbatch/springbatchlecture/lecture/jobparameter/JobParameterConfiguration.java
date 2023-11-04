@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture;
+package io.springbatch.springbatchlecture.lecture.jobparameter;
 
 import java.util.Date;
 import java.util.Map;
@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@Configuration
+// @Configuration
 public class JobParameterConfiguration {
 
 	@Bean

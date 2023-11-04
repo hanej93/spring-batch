@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture;
+package io.springbatch.springbatchlecture.lecture.jobparameter;
 
 import java.util.Date;
 
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+// @Component
 @RequiredArgsConstructor
 public class JobParameterTest implements ApplicationRunner {
 
