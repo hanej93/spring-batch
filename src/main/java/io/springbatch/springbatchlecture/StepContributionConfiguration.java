@@ -11,14 +11,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-public class StepExecutionConfiguration {
+public class StepContributionConfiguration {
 
 	@Bean
-	public Job job(JobRepository jobRepository, Step step1, Step step2, Step step3) {
+	public Job job(JobRepository jobRepository, Step step1, Step step2) {
 		return new JobBuilder("job", jobRepository)
 			.start(step1)
 			.next(step2)
-			.next(step3)
 			.build();
 	}
 
@@ -37,17 +36,6 @@ public class StepExecutionConfiguration {
 		return new StepBuilder("step2", jobRepository)
 			.tasklet((contribution, chunkContext) -> {
 				System.out.println("step2 was executed");
-				// throw new RuntimeException("step2 has failed");
-				return RepeatStatus.FINISHED;
-			}, transactionManager)
-			.build();
-	}
-
-	@Bean
-	public Step step3(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-		return new StepBuilder("step3", jobRepository)
-			.tasklet((contribution, chunkContext) -> {
-				System.out.println("step3 was executed");
 				return RepeatStatus.FINISHED;
 			}, transactionManager)
 			.build();
