@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture;
+package io.springbatch.springbatchlecture.lecture.step;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@Configuration
+import io.springbatch.springbatchlecture.lecture.step.CustomTasklet;
+
+// @Configuration
 public class StepConfiguration {
 
 	@Bean
