@@ -12,7 +12,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+//@Configuration
 public class ExecutionContextConfiguration {
 
 	private final ExecutionContextTasklet1 executionContextTasklet1;
