@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.joblauncher;
+package io.springbatch.springbatchlecture;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -14,32 +14,31 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Configuration
-public class JobRepositoryConfiguration {
+public class JobConfiguration2 {
 
 	@Bean
-	public Job job(JobRepository jobRepository, Step step1, Step step2) {
-		return new JobBuilder("batchJob", jobRepository)
-			.start(step1)
-			.next(step2)
+	public Job batchJob2(JobRepository jobRepository, Step step3, Step step4) {
+		return new JobBuilder("batchJob2", jobRepository)
+			.start(step3)
+			.next(step4)
 			.build();
 	}
 
 	@Bean
-	public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-		return new StepBuilder("step1", jobRepository)
+	public Step step3(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+		return new StepBuilder("step3", jobRepository)
 			.tasklet((contribution, chunkContext) -> {
-				Thread.sleep(3000);
-				System.out.println("step1 was executed");
+				System.out.println("step3 was executed");
 				return RepeatStatus.FINISHED;
 			}, transactionManager)
 			.build();
 	}
 
 	@Bean
-	public Step step2(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-		return new StepBuilder("step2", jobRepository)
+	public Step step4(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+		return new StepBuilder("step4", jobRepository)
 			.tasklet((contribution, chunkContext) -> {
-				System.out.println("step2 was executed");
+				System.out.println("step4 was executed");
 				return RepeatStatus.FINISHED;
 			}, transactionManager)
 			.build();
