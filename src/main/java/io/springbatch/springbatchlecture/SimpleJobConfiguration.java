@@ -33,19 +33,6 @@ public class SimpleJobConfiguration {
 			.start(step1())
 			.next(step2())
 			.next(step3())
-			.incrementer(new RunIdIncrementer())
-			.validator(parameters -> {
-
-			})
-			.preventRestart()
-			.listener(new JobExecutionListener() {
-				@Override
-				public void beforeJob(JobExecution jobExecution) {
-				}
-				@Override
-				public void afterJob(JobExecution jobExecution) {
-				}
-			})
 			.build();
 	}
 
