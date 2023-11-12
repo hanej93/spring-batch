@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture;
+package io.springbatch.springbatchlecture.lecture.section4.incrementer;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

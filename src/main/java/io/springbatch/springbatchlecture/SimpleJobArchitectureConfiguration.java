@@ -1,7 +1,5 @@
 package io.springbatch.springbatchlecture;
 
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -17,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Configuration
-public class IncrementerConfiguration {
+public class SimpleJobArchitectureConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -28,7 +26,6 @@ public class IncrementerConfiguration {
 			.start(step1())
 			.next(step2())
 			.next(step3())
-			// .incrementer(new CustomJobParametersIncrementer())
 			.incrementer(new RunIdIncrementer())
 			.build();
 	}
