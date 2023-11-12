@@ -3,14 +3,9 @@ package io.springbatch.springbatchlecture;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -22,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Configuration
-public class SimpleJobConfiguration {
+public class ValidatorConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -33,6 +28,8 @@ public class SimpleJobConfiguration {
 			.start(step1())
 			.next(step2())
 			.next(step3())
+			// .validator(new CustomJobParametersValidator())
+			.validator(new DefaultJobParametersValidator(new String[]{"name", "date"}, new String[]{"count"}))
 			.build();
 	}
 
