@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.section5;
+package io.springbatch.springbatchlecture.lecture.section5._1_simplebuilder;
 
 import java.util.HashMap;
 import java.util.Map;
