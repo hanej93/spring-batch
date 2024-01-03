@@ -1,8 +1,9 @@
-package io.springbatch.springbatchlecture;
+package io.springbatch.springbatchlecture.lecture.section5._5_taskletsteparchitecture;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -10,12 +11,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import io.springbatch.springbatchlecture.lecture.section5._3_tasklet.CustomTasklet;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Configuration
-public class Limit_AllowConfiguration {
+public class TaskletStepArchitectureConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -23,6 +23,7 @@ public class Limit_AllowConfiguration {
 	@Bean
 	public Job batchJob() {
 		return new JobBuilder("batchJob", jobRepository)
+			.incrementer(new RunIdIncrementer())
 			.start(step1())
 			.next(step2())
 			.build();
@@ -46,8 +47,7 @@ public class Limit_AllowConfiguration {
 			.tasklet((contribution, chunkContext) -> {
 				System.out.println("contribution = " + contribution);
 				System.out.println("chunkContext = " + chunkContext);
-				throw new RuntimeException("step2 was failed");
-				// return RepeatStatus.FINISHED;
+				return RepeatStatus.FINISHED;
 			}, transactionManager)
 			.startLimit(3)
 			.build();
