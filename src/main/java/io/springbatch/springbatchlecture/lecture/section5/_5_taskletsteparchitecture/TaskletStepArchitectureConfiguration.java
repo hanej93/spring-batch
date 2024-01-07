@@ -14,7 +14,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+// @Configuration
 public class TaskletStepArchitectureConfiguration {
 
 	private final JobRepository jobRepository;
