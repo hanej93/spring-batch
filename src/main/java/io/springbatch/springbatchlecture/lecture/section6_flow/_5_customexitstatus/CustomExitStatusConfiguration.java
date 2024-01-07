@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.section6_flow._4_transition;
+package io.springbatch.springbatchlecture.lecture.section6_flow._5_customexitstatus;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -14,8 +14,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-// @Configuration
-public class TransitionConfiguration {
+@Configuration
+public class CustomExitStatusConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -26,15 +26,8 @@ public class TransitionConfiguration {
 			.start(step1())
 				.on("FAILED")
 				.to(step2())
-				.on("FAILED")
+				.on("PASS")
 				.stop()
-			.from(step1())
-				.on("*")
-				.to(step3())
-				.next(step4())
-			.from(step2())
-				.on("*")
-				.to(step5())
 			.end()
 			.build();
 	}
@@ -44,7 +37,7 @@ public class TransitionConfiguration {
 		return new StepBuilder("step1", jobRepository)
 			.tasklet((contribution, chunkContext) -> {
 				System.out.println("step1 has executed");
-				contribution.setExitStatus(ExitStatus.FAILED);
+				contribution.getStepExecution().setExitStatus(ExitStatus.FAILED);
 				return RepeatStatus.FINISHED;
 			}, transactionManager)
 			.build();
@@ -55,39 +48,9 @@ public class TransitionConfiguration {
 		return new StepBuilder("step2", jobRepository)
 			.tasklet((contribution, chunkContext) -> {
 				System.out.println("step2 has executed");
-				contribution.setExitStatus(ExitStatus.FAILED);
 				return RepeatStatus.FINISHED;
 			}, transactionManager)
-			.build();
-	}
-
-	@Bean
-	public Step step3() {
-		return new StepBuilder("step3", jobRepository)
-			.tasklet((contribution, chunkContext) -> {
-				System.out.println("step3 has executed");
-				return RepeatStatus.FINISHED;
-			}, transactionManager)
-			.build();
-	}
-
-	@Bean
-	public Step step4() {
-		return new StepBuilder("step4", jobRepository)
-			.tasklet((contribution, chunkContext) -> {
-				System.out.println("step4 has executed");
-				return RepeatStatus.FINISHED;
-			}, transactionManager)
-			.build();
-	}
-
-	@Bean
-	public Step step5() {
-		return new StepBuilder("step5", jobRepository)
-			.tasklet((contribution, chunkContext) -> {
-				System.out.println("step5 has executed");
-				return RepeatStatus.FINISHED;
-			}, transactionManager)
+			.listener(new PassCheckingListener())
 			.build();
 	}
 }
