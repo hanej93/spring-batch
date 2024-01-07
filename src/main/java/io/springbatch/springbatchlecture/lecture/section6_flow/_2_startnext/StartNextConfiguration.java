@@ -15,7 +15,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+// @Configuration
 public class StartNextConfiguration {
 
 	private final JobRepository jobRepository;
