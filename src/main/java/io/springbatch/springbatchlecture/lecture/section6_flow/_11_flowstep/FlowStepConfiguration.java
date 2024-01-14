@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.section6_flow._10_simpleflowarchitecture;
+package io.springbatch.springbatchlecture.lecture.section6_flow._11_flowstep;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -15,8 +15,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-// @Configuration
-public class SimpleFlowArchitectureConfiguration {
+@Configuration
+public class FlowStepConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -24,20 +24,22 @@ public class SimpleFlowArchitectureConfiguration {
 	@Bean
 	public Job batchJob() {
 		return new JobBuilder("batchJob", jobRepository)
-			.start(step1())
-			.on("COMPLETED").to(step2())
-			.from(step1())
-			.on("FAILED").to(flow())
-			.end()
+			.start(flowStep())
+			.next(step2())
 			.build();
 	}
 
 	@Bean
-	Flow flow() {
+	public Step flowStep() {
+		return new StepBuilder("flowStep", jobRepository)
+			.flow(flow())
+			.build();
+	}
+
+	@Bean
+	public Flow flow() {
 		return new FlowBuilder<Flow>("flow")
-			.start(step2())
-			.on("*")
-			.to(step3())
+			.start(step1())
 			.end();
 	}
 
@@ -56,16 +58,6 @@ public class SimpleFlowArchitectureConfiguration {
 		return new StepBuilder("step2", jobRepository)
 			.tasklet((contribution, chunkContext) -> {
 				System.out.println("step2 has executed");
-				return RepeatStatus.FINISHED;
-			}, transactionManager)
-			.build();
-	}
-
-	@Bean
-	public Step step3() {
-		return new StepBuilder("step3", jobRepository)
-			.tasklet((contribution, chunkContext) -> {
-				System.out.println("step3 has executed");
 				return RepeatStatus.FINISHED;
 			}, transactionManager)
 			.build();
