@@ -17,7 +17,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+// @Configuration
 public class JobScope_StepScope_Configuration {
 
 	private final JobRepository jobRepository;
