@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.section7_chunk;
+package io.springbatch.springbatchlecture.lecture.section7_chunk._1_chunk;
 
 import java.util.Arrays;
 
@@ -21,7 +21,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+// @Configuration
 public class ChunkConfiguration {
 
 	private final JobRepository jobRepository;
