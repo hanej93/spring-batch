@@ -1,12 +1,10 @@
-package io.springbatch.springbatchlecture.lecture.section6_flow._7_flowjob;
+package io.springbatch.springbatchlecture.lecture.section6_flow._8_simpleflow;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.flow.Flow;
-import org.springframework.batch.core.job.flow.JobExecutionDecider;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -14,12 +12,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import io.springbatch.springbatchlecture.lecture.section6_flow._6_jobexecutiondecider.CustomDecider;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-// @Configuration
-public class FlowJobConfiguration {
+@Configuration
+public class SimpleFlowConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -34,7 +31,7 @@ public class FlowJobConfiguration {
 	}
 
 	@Bean
-	public Flow flow() {
+	Flow flow() {
 		return new FlowBuilder<Flow>("flow")
 			.start(step1())
 			.next(step2())
