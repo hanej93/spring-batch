@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.section7_chunk._2_chunkorientedtasklet;
+package io.springbatch.springbatchlecture.lecture.section7_chunk._3_chunkprovider_chunkprocess;
 
 import java.util.Arrays;
 
@@ -16,8 +16,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-// @Configuration
-public class ChunkOrientedTaskletConfiguration {
+@Configuration
+public class ChunkProvider_ChunkProcessConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
