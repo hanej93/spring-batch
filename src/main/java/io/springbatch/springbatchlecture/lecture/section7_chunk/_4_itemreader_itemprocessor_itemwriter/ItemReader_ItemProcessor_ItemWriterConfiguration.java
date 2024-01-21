@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.section7_chunk._3_chunkprovider_chunkprocess;
+package io.springbatch.springbatchlecture.lecture.section7_chunk._4_itemreader_itemprocessor_itemwriter;
 
 import java.util.Arrays;
 
@@ -7,6 +7,9 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
@@ -16,8 +19,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-// @Configuration
-public class ChunkProvider_ChunkProcessConfiguration {
+@Configuration
+public class ItemReader_ItemProcessor_ItemWriterConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -33,13 +36,30 @@ public class ChunkProvider_ChunkProcessConfiguration {
 	@Bean
 	public Step step1() {
 		return new StepBuilder("step1", jobRepository)
-			.<String, String>chunk(2, transactionManager)
-			.reader(new ListItemReader<>(Arrays.asList("item1", "item2", "item3", "item4", "item5", "item6")))
-			.processor(item -> "my_" + item)
-			.writer(chunk -> {
-				chunk.forEach(item -> System.out.println("item = " + item));
-			})
+			.<Customer, Customer>chunk(3, transactionManager)
+			.reader(itemReader())
+			.processor(itemProcessor())
+			.writer(itemWriter())
 			.build();
+	}
+
+	@Bean
+	public ItemWriter<? super Customer> itemWriter() {
+		return new CustomItemWriter();
+	}
+
+	@Bean
+	public ItemProcessor<? super Customer, ? extends Customer> itemProcessor() {
+		return new CustomItemProcessor();
+	}
+
+	@Bean
+	public ItemReader<Customer> itemReader() {
+		return new CustomItemReader(Arrays.asList(
+			new Customer("user1"),
+			new Customer("user2"),
+			new Customer("user3")
+		));
 	}
 
 	@Bean
