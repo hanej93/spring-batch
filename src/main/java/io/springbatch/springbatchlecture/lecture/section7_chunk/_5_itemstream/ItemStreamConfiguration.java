@@ -1,6 +1,8 @@
-package io.springbatch.springbatchlecture.lecture.section7_chunk._4_itemreader_itemprocessor_itemwriter;
+package io.springbatch.springbatchlecture.lecture.section7_chunk._5_itemstream;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -10,17 +12,20 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import io.springbatch.springbatchlecture.lecture.section7_chunk._4_itemreader_itemprocessor_itemwriter.CustomItemProcessor;
+import io.springbatch.springbatchlecture.lecture.section7_chunk._4_itemreader_itemprocessor_itemwriter.CustomItemReader;
+import io.springbatch.springbatchlecture.lecture.section7_chunk._4_itemreader_itemprocessor_itemwriter.CustomItemWriter;
+import io.springbatch.springbatchlecture.lecture.section7_chunk._4_itemreader_itemprocessor_itemwriter.Customer;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-// @Configuration
-public class ItemReader_ItemProcessor_ItemWriterConfiguration {
+@Configuration
+public class ItemStreamConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -36,30 +41,25 @@ public class ItemReader_ItemProcessor_ItemWriterConfiguration {
 	@Bean
 	public Step step1() {
 		return new StepBuilder("step1", jobRepository)
-			.<Customer, Customer>chunk(3, transactionManager)
+			.<String, String>chunk(5, transactionManager)
 			.reader(itemReader())
-			.processor(itemProcessor())
 			.writer(itemWriter())
 			.build();
 	}
 
 	@Bean
-	public ItemWriter<? super Customer> itemWriter() {
-		return new CustomItemWriter();
+	public CustomItemStreamWriter itemWriter() {
+		return new CustomItemStreamWriter();
 	}
 
 	@Bean
-	public ItemProcessor<? super Customer, ? extends Customer> itemProcessor() {
-		return new CustomItemProcessor();
-	}
+	public CustomItemStreamReader itemReader() {
+		List<String> items = new ArrayList<>(10);
 
-	@Bean
-	public ItemReader<Customer> itemReader() {
-		return new CustomItemReader(Arrays.asList(
-			new Customer("user1"),
-			new Customer("user2"),
-			new Customer("user3")
-		));
+		for (int i = 0; i < 10; i++) {
+			items.add(String.valueOf(i));
+		}
+		return new CustomItemStreamReader(items);
 	}
 
 	@Bean
