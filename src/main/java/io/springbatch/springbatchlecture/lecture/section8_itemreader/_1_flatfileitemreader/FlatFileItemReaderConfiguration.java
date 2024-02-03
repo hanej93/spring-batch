@@ -1,31 +1,26 @@
-package io.springbatch.springbatchlecture.lecture.section7_chunk._5_itemstream;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+package io.springbatch.springbatchlecture.lecture.section8_itemreader._1_flatfileitemreader;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import io.springbatch.springbatchlecture.lecture.section7_chunk._4_itemreader_itemprocessor_itemwriter.CustomItemProcessor;
-import io.springbatch.springbatchlecture.lecture.section7_chunk._4_itemreader_itemprocessor_itemwriter.CustomItemReader;
-import io.springbatch.springbatchlecture.lecture.section7_chunk._4_itemreader_itemprocessor_itemwriter.CustomItemWriter;
-import io.springbatch.springbatchlecture.lecture.section7_chunk._4_itemreader_itemprocessor_itemwriter.Customer;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-// @Configuration
-public class ItemStreamConfiguration {
+@Configuration
+public class FlatFileItemReaderConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -41,25 +36,27 @@ public class ItemStreamConfiguration {
 	@Bean
 	public Step step1() {
 		return new StepBuilder("step1", jobRepository)
-			.<String, String>chunk(5, transactionManager)
+			.<Customer, Customer>chunk(5, transactionManager)
 			.reader(itemReader())
-			.writer(itemWriter())
+			.writer((ItemWriter<Customer>)chunk -> {
+				chunk.forEach(item -> System.out.println("item = " + item));
+				System.out.println("");
+			})
 			.build();
 	}
 
 	@Bean
-	public CustomItemStreamWriter itemWriter() {
-		return new CustomItemStreamWriter();
-	}
+	public ItemReader itemReader() {
+		FlatFileItemReader<Customer> itemReader = new FlatFileItemReader<>();
+		itemReader.setResource(new ClassPathResource("/customer.csv"));
 
-	@Bean
-	public CustomItemStreamReader itemReader() {
-		List<String> items = new ArrayList<>(10);
+		DefaultLineMapper<Customer> lineMapper = new DefaultLineMapper<>();
+		lineMapper.setLineTokenize(new DelimitedLineTokenizer());
+		lineMapper.setFieldSetMapper(new CustomerFieldSetMapper());
 
-		for (int i = 0; i < 10; i++) {
-			items.add(String.valueOf(i));
-		}
-		return new CustomItemStreamReader(items);
+		itemReader.setLineMapper(lineMapper);
+		itemReader.setLinesToSkip(1);
+		return itemReader;
 	}
 
 	@Bean
