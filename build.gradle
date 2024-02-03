@@ -19,6 +19,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework:spring-oxm'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     implementation 'com.thoughtworks.xstream:xstream:1.4.16'
 
