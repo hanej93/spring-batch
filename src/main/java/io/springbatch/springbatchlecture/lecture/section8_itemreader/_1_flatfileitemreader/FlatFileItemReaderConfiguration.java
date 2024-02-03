@@ -9,6 +9,8 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
@@ -47,16 +49,15 @@ public class FlatFileItemReaderConfiguration {
 
 	@Bean
 	public ItemReader itemReader() {
-		FlatFileItemReader<Customer> itemReader = new FlatFileItemReader<>();
-		itemReader.setResource(new ClassPathResource("/customer.csv"));
-
-		DefaultLineMapper<Customer> lineMapper = new DefaultLineMapper<>();
-		lineMapper.setLineTokenize(new DelimitedLineTokenizer());
-		lineMapper.setFieldSetMapper(new CustomerFieldSetMapper());
-
-		itemReader.setLineMapper(lineMapper);
-		itemReader.setLinesToSkip(1);
-		return itemReader;
+		return new FlatFileItemReaderBuilder<Customer>()
+			.name("flatFile")
+			.resource(new ClassPathResource("/customer.csv"))
+			.fieldSetMapper(new BeanWrapperFieldSetMapper<>())
+			.targetType(Customer.class)
+			.linesToSkip(1)
+			.delimited().delimiter(",")
+			.names("name", "age", "year")
+			.build();
 	}
 
 	@Bean
