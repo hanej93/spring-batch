@@ -1,4 +1,7 @@
-package io.springbatch.springbatchlecture.lecture.section8_itemreader._4_exceptionhandling;
+package io.springbatch.springbatchlecture.lecture.section8_itemreader._5_staxeventitemreader;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -7,20 +10,20 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
-import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
-import org.springframework.batch.item.file.transform.Range;
+import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.oxm.Unmarshaller;
+import org.springframework.oxm.xstream.XStreamMarshaller;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import io.springbatch.springbatchlecture.lecture.section8_itemreader._5_staxeventitemreader.Customer;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-// @Configuration
-public class ExceptionHandlingConfiguration {
+@Configuration
+public class XMLConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -37,8 +40,8 @@ public class ExceptionHandlingConfiguration {
 	public Step step1() {
 		return new StepBuilder("step1", jobRepository)
 			.<Customer, Customer>chunk(5, transactionManager)
-			.reader(itemReader())
-			.writer((ItemWriter<Customer>)chunk -> {
+			.reader(customerItemReader())
+			.writer(chunk -> {
 				chunk.forEach(item -> System.out.println("item = " + item));
 				System.out.println("");
 			})
@@ -46,20 +49,26 @@ public class ExceptionHandlingConfiguration {
 	}
 
 	@Bean
-	public ItemReader itemReader() {
-		return new FlatFileItemReaderBuilder<Customer>()
-			.name("flatFile")
-			.resource(new FileSystemResource("C:\\Users\\hanej\\Desktop\\Study\\정수원\\spring-batch\\springbatch\\src\\main\\resources\\customer.txt"))
-			.fieldSetMapper(new BeanWrapperFieldSetMapper<>())
-			.targetType(Customer.class)
-			.linesToSkip(1)
-			.fixedLength()
-			.strict(false)
-			.addColumns(new Range(1, 5))
-			.addColumns(new Range(6, 7))
-			.addColumns(new Range(8, 11))
-			.names("name", "age", "year")
+	public ItemReader<? extends Customer> customerItemReader() {
+		return new StaxEventItemReaderBuilder<Customer>()
+			.name("staxxml")
+			.resource(new ClassPathResource("customer.xml"))
+			.addFragmentRootElements("customer")
+			.unmarshaller(itemUnmarshaller())
 			.build();
+	}
+
+	@Bean
+	public Unmarshaller itemUnmarshaller() {
+		Map<String, Class<?>> aliases = new HashMap<>();
+		aliases.put("customer", Customer.class);
+		aliases.put("id", Long.class);
+		aliases.put("name", String.class);
+		aliases.put("age", Integer.class);
+
+		XStreamMarshaller xStreamMarshaller = new XStreamMarshaller();
+		xStreamMarshaller.setAliases(aliases);
+		return xStreamMarshaller;
 	}
 
 	@Bean
