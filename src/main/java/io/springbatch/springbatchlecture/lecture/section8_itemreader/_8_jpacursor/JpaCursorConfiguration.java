@@ -13,15 +13,14 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
-public class JdbcCursorConfiguration {
+// @Configuration
+public class JpaCursorConfiguration {
 
 	public static final int CHUNK_SIZE = 10;
 
