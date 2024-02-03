@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.section8_itemreader._3_fixedlength;
+package io.springbatch.springbatchlecture.lecture.section8_itemreader._4_exceptionhandling;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -13,15 +13,14 @@ import org.springframework.batch.item.file.transform.Range;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-// @Configuration
-public class FixedLengthConfiguration {
+@Configuration
+public class ExceptionHandlingConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -55,9 +54,10 @@ public class FixedLengthConfiguration {
 			.targetType(Customer.class)
 			.linesToSkip(1)
 			.fixedLength()
+			.strict(false)
 			.addColumns(new Range(1, 5))
 			.addColumns(new Range(6, 7))
-			.addColumns(new Range(8))
+			.addColumns(new Range(8, 11))
 			.names("name", "age", "year")
 			.build();
 	}
