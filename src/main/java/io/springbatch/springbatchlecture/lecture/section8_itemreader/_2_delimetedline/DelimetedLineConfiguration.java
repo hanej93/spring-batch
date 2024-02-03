@@ -1,20 +1,16 @@
-package io.springbatch.springbatchlecture.lecture.section8_itemreader._1_flatfileitemreader;
+package io.springbatch.springbatchlecture.lecture.section8_itemreader._2_delimetedline;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -22,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 // @Configuration
-public class FlatFileItemReaderConfiguration {
+public class DelimetedLineConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -49,16 +45,15 @@ public class FlatFileItemReaderConfiguration {
 
 	@Bean
 	public ItemReader itemReader() {
-		FlatFileItemReader<Customer> itemReader = new FlatFileItemReader<>();
-		itemReader.setResource(new ClassPathResource("/customer.csv"));
-
-		DefaultLineMapper<Customer> lineMapper = new DefaultLineMapper<>();
-		lineMapper.setLineTokenize(new DelimitedLineTokenizer());
-		lineMapper.setFieldSetMapper(new CustomerFieldSetMapper());
-
-		itemReader.setLineMapper(lineMapper);
-		itemReader.setLinesToSkip(1);
-		return itemReader;
+		return new FlatFileItemReaderBuilder<Customer>()
+			.name("flatFile")
+			.resource(new ClassPathResource("/customer.csv"))
+			.fieldSetMapper(new BeanWrapperFieldSetMapper<>())
+			.targetType(Customer.class)
+			.linesToSkip(1)
+			.delimited().delimiter(",")
+			.names("name", "age", "year")
+			.build();
 	}
 
 	@Bean
