@@ -17,7 +17,7 @@ import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+// @Configuration
 public class JpaPagingConfiguration {
 
 	public static final int CHUNK_SIZE = 10;
