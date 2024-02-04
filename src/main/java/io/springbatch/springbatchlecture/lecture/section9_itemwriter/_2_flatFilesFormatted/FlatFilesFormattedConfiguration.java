@@ -23,7 +23,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+// @Configuration
 public class FlatFilesFormattedConfiguration {
 
 	public static final int CHUNK_SIZE = 10;
