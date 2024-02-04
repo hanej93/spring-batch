@@ -12,7 +12,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
+// @Entity
 public class Customer2 {
 
 	@Id
