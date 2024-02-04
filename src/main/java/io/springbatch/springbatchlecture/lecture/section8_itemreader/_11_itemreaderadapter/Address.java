@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.section8_itemreader._10_jpapaging;
+package io.springbatch.springbatchlecture.lecture.section8_itemreader._11_itemreaderadapter;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
+// @Entity
 public class Address {
 
 	@Id

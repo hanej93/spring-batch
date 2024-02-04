@@ -10,14 +10,12 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.adapter.ItemReaderAdapter;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import io.springbatch.springbatchlecture.lecture.section8_itemreader._10_jpapaging.Customer;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+// @Configuration
 public class ItemReaderAdapterConfiguration {
 
 	public static final int CHUNK_SIZE = 10;

@@ -47,7 +47,7 @@ public class DelimetedLineConfiguration {
 	public ItemReader itemReader() {
 		return new FlatFileItemReaderBuilder<Customer>()
 			.name("flatFile")
-			.resource(new ClassPathResource("/customer.csv"))
+			.resource(new ClassPathResource("/files/customer.csv"))
 			.fieldSetMapper(new BeanWrapperFieldSetMapper<>())
 			.targetType(Customer.class)
 			.linesToSkip(1)

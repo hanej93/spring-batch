@@ -11,7 +11,6 @@ import org.springframework.batch.item.json.JacksonJsonObjectReader;
 import org.springframework.batch.item.json.builder.JsonItemReaderBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -45,7 +44,7 @@ public class JsonConfiguration {
 	public ItemReader<? extends Customer> customerItemReader() {
 		return new JsonItemReaderBuilder<Customer>()
 			.name("jsonReader")
-			.resource(new ClassPathResource("customer.json"))
+			.resource(new ClassPathResource("files/customer.json"))
 			.jsonObjectReader(new JacksonJsonObjectReader<>(Customer.class))
 			.build();
 	}
