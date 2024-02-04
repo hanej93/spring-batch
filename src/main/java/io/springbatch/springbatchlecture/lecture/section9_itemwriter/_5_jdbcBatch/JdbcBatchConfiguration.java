@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.section9_itemwriter._4_jsonFile;
+package io.springbatch.springbatchlecture.lecture.section9_itemwriter._5_jdbcBatch;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,11 +14,11 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.Order;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
 import org.springframework.batch.item.json.JacksonJsonObjectMarshaller;
 import org.springframework.batch.item.json.builder.JsonFileItemWriterBuilder;
-import org.springframework.batch.item.xml.builder.StaxEventItemWriterBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,8 +30,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-// @Configuration
-public class JsonConfiguration {
+@Configuration
+public class JdbcBatchConfiguration {
 
 	public static final int CHUNK_SIZE = 10;
 
@@ -59,26 +59,11 @@ public class JsonConfiguration {
 
 	@Bean
 	public ItemWriter<? super Customer> customerItemWriter() {
-		return new JsonFileItemWriterBuilder<Customer>()
-			.name("jsonFileWriter")
-			.jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
-			.resource(new FileSystemResource("C:\\Users\\hanej\\Desktop\\Study\\정수원\\spring-batch\\springbatch\\src\\main\\resources\\files\\customer.json"))
+		return new JdbcBatchItemWriterBuilder<Customer>()
+			.dataSource(dataSource)
+			.sql("insert into customer2 values (:id, :firstname, :lastname, :birthdate)")
+			.beanMapped()
 			.build();
-	}
-
-	@Bean
-	public Marshaller itemMarshaller() {
-		Map<String, Class<?>> aliases = new HashMap<>();
-		aliases.put("customer", Customer.class);
-		aliases.put("id", Long.class);
-		aliases.put("firstname", String.class);
-		aliases.put("lastname", String.class);
-		aliases.put("birthdate", String.class);
-
-		XStreamMarshaller xStreamMarshaller = new XStreamMarshaller();
-		xStreamMarshaller.setAliases(aliases);
-
-		return xStreamMarshaller;
 	}
 
 	@Bean
