@@ -1,4 +1,4 @@
-CREATE TABLE `customer` (
+CREATE TABLE `customer2` (
     `id` mediumint(8) unsigned NOT NULL auto_increment,
     `firstname` varchar(255) default NULL,
     `lastname` varchar(255) default NULL,
