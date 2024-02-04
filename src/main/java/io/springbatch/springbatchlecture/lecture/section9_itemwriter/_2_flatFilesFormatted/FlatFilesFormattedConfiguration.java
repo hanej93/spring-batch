@@ -1,4 +1,5 @@
-package io.springbatch.springbatchlecture.lecture.section9_itemwriter._1_flatFilesDelimited;
+package io.springbatch.springbatchlecture.lecture.section9_itemwriter._2_flatFilesFormatted;
+
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,8 +23,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-// @Configuration
-public class FlatFilesDelimitedConfiguration {
+@Configuration
+public class FlatFilesFormattedConfiguration {
 
 	public static final int CHUNK_SIZE = 10;
 
@@ -53,9 +54,8 @@ public class FlatFilesDelimitedConfiguration {
 		return new FlatFileItemWriterBuilder<Customer>()
 			.name("flatFileWriter")
 			.resource(new FileSystemResource("C:\\Users\\hanej\\Desktop\\Study\\정수원\\spring-batch\\springbatch\\src\\main\\resources\\files\\customer.txt"))
-			.append(true)				// 새로 쓰는게 아닌 이어서 쓰기 작업
-			.shouldDeleteIfEmpty(true)	// 입력할 데이터가 없으면 파일을 삭제하는 옵션
-			.delimited().delimiter("|")
+			.append(true)
+			.formatted().format("%-2d%-15s%-2d")
 			.names("id", "name", "age")
 			.build();
 	}
@@ -67,6 +67,7 @@ public class FlatFilesDelimitedConfiguration {
 			new Customer(2, "hong gil dong2", 42),
 			new Customer(3, "hong gil dong3", 43)
 		);
+
 		return new ListItemReader<>(customers);
 	}
 
