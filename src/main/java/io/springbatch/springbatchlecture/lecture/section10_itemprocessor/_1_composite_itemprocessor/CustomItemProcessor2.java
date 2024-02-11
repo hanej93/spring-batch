@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.section10_itemprocessor.composite_itemprocessor;
+package io.springbatch.springbatchlecture.lecture.section10_itemprocessor._1_composite_itemprocessor;
 
 import org.springframework.batch.item.ItemProcessor;
 
