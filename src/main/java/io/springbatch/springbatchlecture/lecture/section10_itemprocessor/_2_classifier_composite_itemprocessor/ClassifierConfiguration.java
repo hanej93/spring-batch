@@ -23,7 +23,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+// @Configuration
 public class ClassifierConfiguration {
 
 	public static final int CHUNK_SIZE = 10;
