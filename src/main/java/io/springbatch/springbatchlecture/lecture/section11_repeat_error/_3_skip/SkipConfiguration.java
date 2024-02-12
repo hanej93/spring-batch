@@ -1,4 +1,7 @@
-package io.springbatch.springbatchlecture.lecture.section11_repeat_error._2_falut_tolerant;
+package io.springbatch.springbatchlecture.lecture.section11_repeat_error._3_skip;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -6,8 +9,12 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
+import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
+import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
@@ -19,10 +26,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-// @Configuration
-public class FaultTolerantConfiguration {
+@Configuration
+public class SkipConfiguration {
 
-	public static final int CHUNK_SIZE = 10;
+	public static final int CHUNK_SIZE = 5;
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -50,23 +57,39 @@ public class FaultTolerantConfiguration {
 					NonTransientResourceException {
 					i++;
 					System.out.println("FaultTolerantConfiguration.read i=" + i);
-					if (i == 1) {
-						throw new IllegalArgumentException("this exception is skipped");
+					if (i == 3) {
+						throw new SkippableException("skip");
 					}
-					return i > 3 ? null : "item" + i;
+					return i > 20 ? null : String.valueOf(i);
 				}
 			})
-			.processor(item -> {
-				System.out.println("FaultTolerantConfiguration.processor item=" + item);
-				throw new IllegalStateException("this exception is retired");
-			})
-			.writer(items -> System.out.println("items = " + items))
+			.processor(itemProcess())
+			.writer(itemWriter())
 			.faultTolerant()
-			.skip(IllegalArgumentException.class)
-			.skipLimit(2)
-			.retry(IllegalStateException.class)
-			.retryLimit(2)
+			.skip(SkippableException.class)
+			// .noSkip(NonSkippableException.class)
+			.skipLimit(4)
+			// .skipPolicy(limitCheckingItemSkipPolicy())
+			// .skipPolicy(new AlwaysSkipItemSkipPolicy())
 			.build();
+	}
+
+	@Bean
+	public SkipPolicy limitCheckingItemSkipPolicy() {
+		Map<Class<? extends Throwable>, Boolean> exceptionClass = new HashMap<>();
+		exceptionClass.put(SkippableException.class, true);
+
+		return new LimitCheckingItemSkipPolicy(3, exceptionClass);
+	}
+
+	@Bean
+	public ItemWriter<? super String> itemWriter() {
+		return new SkipItemWriter();
+	}
+
+	@Bean
+	public ItemProcessor<? super String, String> itemProcess() {
+		return new SkipItemProcessor();
 	}
 
 	@Bean
