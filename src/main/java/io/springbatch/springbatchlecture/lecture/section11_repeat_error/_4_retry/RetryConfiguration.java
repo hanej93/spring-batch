@@ -1,7 +1,9 @@
 package io.springbatch.springbatchlecture.lecture.section11_repeat_error._4_retry;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -14,6 +16,8 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.RetryPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.RequiredArgsConstructor;
@@ -44,8 +48,11 @@ public class RetryConfiguration {
 			.processor(processor())
 			.writer(items -> items.forEach(item -> System.out.println("item = " + item)))
 			.faultTolerant()
-			.retry(RetryableException.class)
-			.retryLimit(2)
+			.skip(RetryableException.class)
+			.skipLimit(2)
+			// .retry(RetryableException.class)
+			// .retryLimit(2)
+			.retryPolicy(retryPolicy())
 			.build();
 	}
 
@@ -61,6 +68,13 @@ public class RetryConfiguration {
 			items.add(String.valueOf(i));
 		}
 		return new ListItemReader<>(items);
+	}
+
+	@Bean
+	public RetryPolicy retryPolicy() {
+		Map<Class<? extends Throwable>, Boolean> exceptionClass = new HashMap<>();
+		exceptionClass.put(RetryableException.class, true);
+		return new SimpleRetryPolicy(2, exceptionClass);
 	}
 
 	@Bean
