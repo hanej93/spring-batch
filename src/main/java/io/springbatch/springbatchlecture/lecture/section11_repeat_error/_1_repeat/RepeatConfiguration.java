@@ -37,7 +37,7 @@ import io.springbatch.springbatchlecture.lecture.section10_itemprocessor._2_clas
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+// @Configuration
 public class RepeatConfiguration {
 
 	public static final int CHUNK_SIZE = 10;
