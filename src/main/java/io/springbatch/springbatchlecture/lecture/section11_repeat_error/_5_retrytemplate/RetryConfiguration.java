@@ -26,7 +26,7 @@ import io.springbatch.springbatchlecture.lecture.section11_repeat_error._4_retry
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+// @Configuration
 public class RetryConfiguration {
 
 	public static final int CHUNK_SIZE = 5;
