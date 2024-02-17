@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.section12_multi_thread_processing._1_asyncItemProcess_asyncItemWriter;
+package io.springbatch.springbatchlecture.lecture.section12_multi_thread_processing._2_multi_thread_step;
 
 import java.util.Map;
 
@@ -15,21 +15,26 @@ import org.springframework.batch.integration.async.AsyncItemWriter;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
+import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-// @Configuration
-public class AsyncConfiguration {
+@Configuration
+public class MultiThreadStepConfiguration {
 
 	public static final int CHUNK_SIZE = 100;
 
@@ -41,8 +46,7 @@ public class AsyncConfiguration {
 	public Job batchJob() throws InterruptedException {
 		return new JobBuilder("batchJob", jobRepository)
 			.incrementer(new RunIdIncrementer())
-			// .start(step1())
-			.start(asyncStep1())
+			.start(step1())
 			.next(step2())
 			.listener(new StopWatchJobListener())
 			.build();
@@ -53,48 +57,24 @@ public class AsyncConfiguration {
 		return new StepBuilder("step1", jobRepository)
 			.<Customer, Customer>chunk(CHUNK_SIZE, transactionManager)
 			.reader(pagingItemReader())
-			.processor(customItemProcessor())
+			.listener(new CustomItemReadListener())
+			.processor(item -> item)
+			.listener(new CustomItemProcessListener())
 			.writer(customItemWriter())
+			.listener(new CustomItemWriteListener())
+			// .taskExecutor(new SimpleAsyncTaskExecutor())
+			.taskExecutor(taskExecutor())
 			.build();
 	}
 
 	@Bean
-	public Step asyncStep1() throws InterruptedException {
-		return new StepBuilder("asyncStep1", jobRepository)
-			.<Customer, Customer>chunk(CHUNK_SIZE, transactionManager)
-			.reader(pagingItemReader())
-			.processor(asyncItemProcessor())
-			.writer(asyncItemWriter())
-			.build();
-	}
+	public TaskExecutor taskExecutor() {
+		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setCorePoolSize(4);
+		taskExecutor.setMaxPoolSize(8);
+		taskExecutor.setThreadNamePrefix("async-thread");
 
-	@Bean
-	public AsyncItemProcessor asyncItemProcessor() throws InterruptedException {
-		AsyncItemProcessor<Customer, Customer> asyncItemProcessor = new AsyncItemProcessor<>();
-		asyncItemProcessor.setDelegate(customItemProcessor());
-		asyncItemProcessor.setTaskExecutor(new SimpleAsyncTaskExecutor());
-		return asyncItemProcessor;
-	}
-
-	@Bean
-	public AsyncItemWriter<Customer> asyncItemWriter() {
-		AsyncItemWriter<Customer> asyncItemWriter = new AsyncItemWriter<>();
-		asyncItemWriter.setDelegate(customItemWriter());
-		return asyncItemWriter;
-	}
-
-	@Bean
-	public ItemProcessor<Customer, Customer> customItemProcessor() throws InterruptedException {
-		return new ItemProcessor<Customer, Customer>() {
-			@Override
-			public Customer process(Customer item) throws Exception {
-				Thread.sleep(1000);
-				return new Customer(item.getId(),
-					item.getFirstname().toUpperCase(),
-					item.getLastname().toUpperCase(),
-					item.getBirthdate());
-			}
-		};
+		return taskExecutor;
 	}
 
 	@Bean
@@ -111,12 +91,12 @@ public class AsyncConfiguration {
 		MySqlPagingQueryProvider queryProvider = new MySqlPagingQueryProvider();
 		queryProvider.setSelectClause("id, firstname, lastname, birthdate");
 		queryProvider.setFromClause("from customer");
-		queryProvider.setWhereClause("where firstname like :firstname");
+		// queryProvider.setWhereClause("where firstname like :firstname");
 
 		Map<String, Order> sortKeys = Map.of("id", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
 
-		Map<String, Object> parameters = Map.of("firstname", "A%");
+		// Map<String, Object> parameters = Map.of("firstname", "A%");
 
 		return new JdbcPagingItemReaderBuilder<Customer>()
 			.name("jdbcPagingItemReader")
@@ -125,7 +105,19 @@ public class AsyncConfiguration {
 			.rowMapper(new CustomerRowMapper())
 			// .rowMapper(new BeanPropertyRowMapper<>())
 			.queryProvider(queryProvider)
-			.parameterValues(parameters)
+			// .parameterValues(parameters)
+			.build();
+	}
+
+	// 비동기 처리에 문제가 생기는 ItemReader!!!
+	@Bean
+	public JdbcCursorItemReader<Customer> customItemReader() {
+		return new JdbcCursorItemReaderBuilder<Customer>()
+			.name("jdbcCursorItemReader")
+			.fetchSize(CHUNK_SIZE)
+			.sql("select id, firstName, lastName, birthdate from customer")
+			.beanRowMapper(Customer.class)
+			.dataSource(dataSource)
 			.build();
 	}
 
