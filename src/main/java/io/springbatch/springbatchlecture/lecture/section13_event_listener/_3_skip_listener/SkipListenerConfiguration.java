@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.section13_event_listener._2_chunk_listener;
+package io.springbatch.springbatchlecture.lecture.section13_event_listener._3_skip_listener;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -10,20 +10,18 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import io.springbatch.springbatchlecture.lecture.section12_multi_thread_processing._2_multi_thread_step.CustomItemWriteListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-// @Configuration
-public class ChunkListenerConfiguration {
+@Configuration
+public class SkipListenerConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -41,16 +39,24 @@ public class ChunkListenerConfiguration {
 	public Step step1() {
 		return new StepBuilder("step1", jobRepository)
 			.<Integer, String>chunk(5, transactionManager)
-			.listener(new CustomChunkListener())
-			.listener(new CustomItemReadListener())
-			.listener(new CustomItemProcessListener())
-			.listener(new CustomItemWriteListener())
 			.reader(listItemReader())
 			.processor(item -> {
-				throw new RuntimeException();
-				// return "item" + item;
+				System.out.println("processor item = " + item);
+				if (item == 4) {
+					throw new CustomSkipException("process skipped");
+				}
+				return "item" + item;
 			})
-			.writer(chunk -> System.out.println("chunk = " + chunk))
+			.writer(chunk -> chunk.forEach(item -> {
+				if ("item5".equals(item)) {
+					throw new CustomSkipException("item skipped");
+				}
+				System.out.println("write = " + item);
+			}))
+			.faultTolerant()
+			.skip(CustomSkipException.class)
+			.skipLimit(3)
+			.listener(new CustomSkipListener())
 			.build();
 	}
 
@@ -59,7 +65,8 @@ public class ChunkListenerConfiguration {
 		List<Integer> list = IntStream.rangeClosed(1, 10)
 			.boxed()
 			.toList();
-		return new ListItemReader<>(list);
+		System.out.println("reader list = " + list);
+		return new LinkedItemReader<>(list);
 	}
 
 	@Bean
