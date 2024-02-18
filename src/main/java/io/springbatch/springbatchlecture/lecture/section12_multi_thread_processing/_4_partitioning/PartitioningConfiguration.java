@@ -12,16 +12,12 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
-import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,10 +26,14 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import io.springbatch.springbatchlecture.lecture.section12_multi_thread_processing._4_partitioning.ColumnRangePartitioner;
+import io.springbatch.springbatchlecture.lecture.section12_multi_thread_processing._4_partitioning.StopWatchJobListener;
+import io.springbatch.springbatchlecture.lecture.section12_multi_thread_processing._5_not_synchronized.Customer;
+import io.springbatch.springbatchlecture.lecture.section12_multi_thread_processing._5_not_synchronized.CustomerRowMapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+// @Configuration
 public class PartitioningConfiguration {
 
 	public static final int CHUNK_SIZE = 100;
@@ -64,7 +64,7 @@ public class PartitioningConfiguration {
 	@Bean
 	public Step slaveStep() {
 		return new StepBuilder("slaveStep", jobRepository)
-			.<Customer, Customer>chunk(CHUNK_SIZE, transactionManager)
+			.<io.springbatch.springbatchlecture.lecture.section12_multi_thread_processing._5_not_synchronized.Customer, io.springbatch.springbatchlecture.lecture.section12_multi_thread_processing._5_not_synchronized.Customer>chunk(CHUNK_SIZE, transactionManager)
 			.reader(pagingItemReader(null, null))
 			.writer(customItemWriter())
 			.build();
@@ -93,8 +93,8 @@ public class PartitioningConfiguration {
 
 	@Bean
 	@StepScope
-	public ItemWriter<Customer> customItemWriter() {
-		return new JdbcBatchItemWriterBuilder<Customer>()
+	public ItemWriter<io.springbatch.springbatchlecture.lecture.section12_multi_thread_processing._5_not_synchronized.Customer> customItemWriter() {
+		return new JdbcBatchItemWriterBuilder<io.springbatch.springbatchlecture.lecture.section12_multi_thread_processing._5_not_synchronized.Customer>()
 			.dataSource(dataSource)
 			.sql("insert into customer2 values (:id, :firstname, :lastname, :birthdate)")
 			.beanMapped()
@@ -103,7 +103,7 @@ public class PartitioningConfiguration {
 
 	@Bean
 	@StepScope
-	public ItemReader<? extends Customer> pagingItemReader(
+	public ItemReader<? extends io.springbatch.springbatchlecture.lecture.section12_multi_thread_processing._5_not_synchronized.Customer> pagingItemReader(
 		@Value("#{stepExecutionContext['minValue']}") Long minValue,
 		@Value("#{stepExecutionContext['maxValue']}") Long maxValue
 	) {
