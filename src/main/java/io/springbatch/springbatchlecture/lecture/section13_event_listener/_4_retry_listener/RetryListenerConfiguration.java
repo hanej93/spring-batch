@@ -1,4 +1,4 @@
-package io.springbatch.springbatchlecture.lecture.section13_event_listener._3_skip_listener;
+package io.springbatch.springbatchlecture.lecture.section13_event_listener._4_retry_listener;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -20,8 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-// @Configuration
-public class SkipListenerConfiguration {
+@Configuration
+public class RetryListenerConfiguration {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
@@ -40,23 +40,12 @@ public class SkipListenerConfiguration {
 		return new StepBuilder("step1", jobRepository)
 			.<Integer, String>chunk(5, transactionManager)
 			.reader(listItemReader())
-			.processor(item -> {
-				System.out.println("processor item = " + item);
-				if (item == 4) {
-					throw new CustomSkipException("process skipped");
-				}
-				return "item" + item;
-			})
-			.writer(chunk -> chunk.forEach(item -> {
-				if ("item5".equals(item)) {
-					throw new CustomSkipException("item skipped");
-				}
-				System.out.println("write = " + item);
-			}))
+			.processor(new CustomItemProcessor())
+			.writer(new CustomItemWriter())
 			.faultTolerant()
-			.skip(CustomSkipException.class)
-			.skipLimit(3)
-			.listener(new CustomSkipListener())
+			.retry(CustomRetryException.class)
+			.retryLimit(2)
+			.listener(new CustomRetryListener())
 			.build();
 	}
 
