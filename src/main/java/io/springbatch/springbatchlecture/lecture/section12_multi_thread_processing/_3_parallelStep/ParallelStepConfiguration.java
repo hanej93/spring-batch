@@ -19,7 +19,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+// @Configuration
 public class ParallelStepConfiguration {
 
 	public static final int CHUNK_SIZE = 100;
