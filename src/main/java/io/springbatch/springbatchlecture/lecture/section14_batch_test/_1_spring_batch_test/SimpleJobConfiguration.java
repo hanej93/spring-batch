@@ -25,7 +25,7 @@ import io.springbatch.springbatchlecture.lecture.section12_multi_thread_processi
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
+// @Configuration
 public class SimpleJobConfiguration {
 
 	public static final int CHUNK_SIZE = 100;
