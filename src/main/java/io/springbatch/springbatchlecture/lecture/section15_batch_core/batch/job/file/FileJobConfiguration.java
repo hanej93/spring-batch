@@ -45,7 +45,7 @@ public class FileJobConfiguration {
 
 	@Bean
 	public Step fileStep() {
-		return  new StepBuilder("fileStep", jobRepository)
+		return new StepBuilder("fileStep", jobRepository)
 			.<ProductVO, Product>chunk(CHUNK_SIZE, transactionManager)
 			.reader(fileItemReader(null))
 			.processor(fileItemProcessor())
