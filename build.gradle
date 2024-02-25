@@ -27,7 +27,7 @@ dependencies {
 
     implementation 'com.thoughtworks.xstream:xstream:1.4.16'
     implementation 'org.modelmapper:modelmapper:3.2.0'
-    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'org.apache.httpcomponents.client5:httpclient5'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
