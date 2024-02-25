@@ -10,12 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import io.springbatch.springbatchlecture.lecture.section15_batch_core.batch.domain.Product;
-import io.springbatch.springbatchlecture.lecture.section15_batch_core.batch.domain.ProductVO;
 import io.springbatch.springbatchlecture.lecture.section15_batch_core.batch.listener.JobListener;
 import io.springbatch.springbatchlecture.lecture.section15_batch_core.batch.tasklet.ApiEndTasklet;
 import io.springbatch.springbatchlecture.lecture.section15_batch_core.batch.tasklet.ApiStartTasklet;
-import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
