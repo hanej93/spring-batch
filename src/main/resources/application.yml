@@ -39,5 +39,5 @@ spring:
       initialize-schema: always
 #      table-prefix: SYSTEM_
     job:
-      enabled: true
+      enabled: false
 #      name: ${job.name:NONE}
